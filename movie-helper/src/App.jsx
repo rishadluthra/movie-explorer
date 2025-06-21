@@ -19,11 +19,15 @@ const API_OPTIONS = {
 }
 const App = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
-  const [movieList, setMovieList] = useState([]);
-  const [trendingMovies, setTrendingMovies] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+  
+  const [trendingMovies, setTrendingMovies] = useState([]);
+  const [isTrendingMoviesLoading, setIsTrendingMoviesLoading] = useState(false);
+  const [errorMessageTrending, setErrorMessageTrending] = useState('');
+  
+  const [movieList, setMovieList] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   // debouncing the search term to prevent too many api requests
   useDebounce( () => setDebouncedSearchTerm(searchTerm), 500, [searchTerm] );
@@ -45,11 +49,10 @@ const App = () => {
       if (query && response.data.results.length > 0) {
         await updateSearchCount(query, response.data.results[0]);
       }
-      
       return;
     } catch (error) {
       console.log("Error fetching movies: ", error);
-      setErrorMessage("Error fetching movies. Please try again later.");
+      setErrorMessage("Error fetching movies. Please try again later...");
       return;
     } finally {
       setIsLoading(false);
@@ -57,11 +60,16 @@ const App = () => {
   }
 
   const loadTrendingMovies = async () => {
+    setIsTrendingMoviesLoading(true);
+    setErrorMessageTrending('');
     try {
       const movies = await getTrendingMovies();
       setTrendingMovies(movies);
     } catch (error) {
       console.log(`Error fetching trending movies: ${error}`);
+      setErrorMessageTrending("Error fetching trending movies. Please try again later...");
+    } finally {
+      setIsTrendingMoviesLoading(false);
     }
   }
   useEffect(() => {
@@ -88,6 +96,11 @@ const App = () => {
         {trendingMovies.length > 0 && (
           <section className="trending">
             <h2>Trending Movies</h2>
+            { isTrendingMoviesLoading ? (
+              <Spinner />
+            ) : errorMessageTrending ? (
+              <p className="text-red-500"> { errorMessageTrending } </p>
+            ) : (
             <ul>
               {trendingMovies.map((movie, index) => (
                 <li key={movie.$id}>
@@ -96,6 +109,8 @@ const App = () => {
                 </li>
               ))}
             </ul>
+            )
+            }
           </section> 
         )}
 
