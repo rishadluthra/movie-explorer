@@ -20,11 +20,14 @@ const App = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [movieList, setMovieList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const fetchMovies = async () => {
+
+  const fetchMovies = async (query = '') => {
     setIsLoading(true);
     setErrorMessage('');
     try {
-      const endpoint = `${API_URL}/discover/movie?sort_by=popularity.desc`
+      const endpoint = query ? 
+      `${API_URL}/search/movie?query=${encodeURIComponent(query)}`
+      :`${API_URL}/discover/movie?sort_by=popularity.desc`
       const response = await axios.get(endpoint, API_OPTIONS)
       if (response.data === "False") {
         setErrorMessage(response.data.Error || "something went wrong while fetching movies");
@@ -42,8 +45,8 @@ const App = () => {
     }
   }
   useEffect(() => {
-    fetchMovies();
-  }, []);
+    fetchMovies(searchTerm);
+  }, [searchTerm]);
   return (
     <main>
       <div className="pattern" />
