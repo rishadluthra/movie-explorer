@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import './App.css'
-import Search from './components/search'
+import Search from './components/Search'
 import axios from 'axios'
-import Spinner from './components/spinner';
+import Spinner from './components/Spinner';
+import MovieCard from './components/MovieCard';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
@@ -69,7 +70,7 @@ const App = () => {
           ) : (
             <ul>
               { movieList.map((movie) => (
-                <p key={movie.id} className="text-white">{ movie.title }</p>
+                <MovieCard key={movie.id} movie={movie}/>
               ))}
             </ul>
           )
