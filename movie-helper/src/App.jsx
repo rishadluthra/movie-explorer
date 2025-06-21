@@ -4,6 +4,7 @@ import Search from './components/Search'
 import axios from 'axios'
 import Spinner from './components/Spinner';
 import MovieCard from './components/MovieCard';
+import { useDebounce } from 'react-use'
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
@@ -20,6 +21,10 @@ const App = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [movieList, setMovieList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+
+  // debouncing the search term to prevent too many api requests
+  useDebounce( () => setDebouncedSearchTerm(searchTerm), 500, [searchTerm] );
 
   const fetchMovies = async (query = '') => {
     setIsLoading(true);
@@ -45,8 +50,8 @@ const App = () => {
     }
   }
   useEffect(() => {
-    fetchMovies(searchTerm);
-  }, [searchTerm]);
+    fetchMovies(debouncedSearchTerm);
+  }, [debouncedSearchTerm]);
   return (
     <main>
       <div className="pattern" />
